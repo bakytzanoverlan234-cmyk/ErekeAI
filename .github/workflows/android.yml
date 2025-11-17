@@ -11,10 +11,10 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Set up JDK 17
-        uses: actions/setup-java@v3
+        uses: actions/setup-java@v4
         with:
           distribution: temurin
           java-version: 17
@@ -31,22 +31,20 @@ jobs:
 
       - name: Sign APK (jarsigner)
         run: |
-          APK_UNSIGNED=$(find app/build/outputs/apk/release -name "*-unsigned.apk" | head -n 1)
+          APK_UNSIGNED=$(find app/build/outputs/apk -name "*-unsigned.apk" | head -n 1)
           echo "Unsigned APK: $APK_UNSIGNED"
 
-          jarsigner -verbose \
-            -keystore release.jks \
+          jarsigner -verbose -keystore release.jks \
             -storepass "${{ secrets.KEYSTORE_PASSWORD }}" \
             -keypass "${{ secrets.KEY_PASSWORD }}" \
-            "$APK_UNSIGNED" \
-            "${{ secrets.KEY_ALIAS }}"
+            "$APK_UNSIGNED" "${{ secrets.KEY_ALIAS }}" 
 
       - name: Zipalign and final sign (apksigner)
         run: |
           sudo apt-get update
           sudo apt-get install -y zipalign apksigner
 
-          APK_UNSIGNED=$(find app/build/outputs/apk/release -name "*-unsigned.apk" | head -n 1)
+          APK_UNSIGNED=$(find app/build/outputs/apk -name "*-unsigned.apk" | head -n 1)
           APK_ALIGNED=app-release-aligned.apk
           APK_SIGNED=app-release.apk
 
@@ -60,7 +58,7 @@ jobs:
             --out "$APK_SIGNED" \
             "$APK_ALIGNED"
 
-      - name: Upload Signed APK
+      - name: Upload signed APK
         uses: actions/upload-artifact@v4
         with:
           name: ErekeAI-Release-APK
