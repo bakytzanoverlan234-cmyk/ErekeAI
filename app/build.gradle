@@ -4,12 +4,6 @@ android {
     namespace "com.ereke.ai"
     compileSdk 34
 
-    // Отключаем Lint, чтобы не требовал Android SDK
-    lintOptions {
-        checkReleaseBuilds false
-        abortOnError false
-    }
-
     defaultConfig {
         applicationId "com.ereke.ai"
         minSdk 24
@@ -21,8 +15,7 @@ android {
     buildTypes {
         release {
             minifyEnabled false
-            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'),
-                    'proguard-rules.pro'
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
     }
 
@@ -37,29 +30,9 @@ dependencies {
     implementation 'com.google.android.material:material:1.9.0'
     implementation 'androidx.constraintlayout:constraintlayout:2.1.4'
 
-    // OkHttp для HTTP запросов
+    // HTTP клиент
     implementation 'com.squareup.okhttp3:okhttp:4.10.0'
 
-    // Gson для JSON
+    // JSON парсер
     implementation 'com.google.code.gson:gson:2.10.1'
-}
-
-/*
- * Отключаем ВСЕ задачи, которые требуют полноценный Android SDK.
- * Иначе Gradle будет падать в Termux.
- */
-tasks.whenTaskAdded { task ->
-    def name = task.name.toLowerCase()
-    if (name.contains("lint") ||
-        name.contains("bundle") ||
-        name.contains("androidtest") ||
-        name.contains("mergeextdex") ||
-        name.contains("processdebugmainmanifest") ||
-        name.contains("processreleasemainmanifest") ||
-        name.contains("compiledebugshaders") ||
-        name.contains("compiledebugrenderscript") ||
-        name.contains("compileleaseshaders") ||
-        name.contains("compileleaserenderscript")) {
-        task.enabled = false
-    }
 }
